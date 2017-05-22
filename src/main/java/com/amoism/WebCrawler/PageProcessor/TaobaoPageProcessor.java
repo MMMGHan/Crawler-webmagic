@@ -1,6 +1,7 @@
 package com.amoism.WebCrawler.PageProcessor;
 
 import com.amoism.WebCrawler.Dao.TaobaoDao;
+import com.amoism.WebCrawler.Downloader.PhantomJSDownloader;
 import com.amoism.WebCrawler.Taobao;
 import com.amoism.WebCrawler.Url;
 import com.amoism.WebCrawler.UrlDao.Url_TaobaoDao;
@@ -42,9 +43,10 @@ public class TaobaoPageProcessor implements PageProcessor {
     public void process(Page page) {
 
         try {
-            getAjaxContent(page.getUrl().get());
+            String html = getAjaxContent(page.getUrl().get());
+            System.out.println("html = " + html);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("error:" + e.getMessage());
         }
 
         List<String> urls =
@@ -54,8 +56,10 @@ public class TaobaoPageProcessor implements PageProcessor {
         /**
          * 放入urlhub_taobao表中 做去重
          */
-        for (String u:urls
-             ) {
+        System.out.println(urls);
+
+        for (String u : urls
+                ) {
             System.out.println(u);
             Url_TaobaoDao urlDao = new Url_TaobaoDao();
             Url url = new Url();
@@ -91,12 +95,10 @@ public class TaobaoPageProcessor implements PageProcessor {
     }
 
     public static void main(String[] args) {
-        try {
-            getAjaxContent("https://s.taobao.com/list?spm=a217f.8051907.312344.1.HFZDEO&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&cat=16&style=grid&seller_type=taobao");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Spider.create(new TaobaoPageProcessor()).addUrl(URL_Start).thread(5).run();
+        Spider.create(new TaobaoPageProcessor())
+                .setDownloader(new PhantomJSDownloader("/Users/amoism/bin/phantomjs", "/Users/amoism/Projects/phantomjs/codes.js"))
+                .addUrl(URL_Start)
+                .thread(5)
+                .run();
     }
 }
