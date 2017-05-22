@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="log4j.base">/data/logs/demo</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+        <RollingFile name="runinfo1" fileName="${log4j.base}/runinfo.log"
+                     filePattern="${log4j.base}/runinfo-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p [%c] - %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1024 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1"/>
+        </RollingFile>
+        <Async name="runinfo">
+            <AppenderRef ref="runinfo1"/>
+        </Async>
+
+        <RollingFile name="doc-searcher-catcher" fileName="${log4j.base}/doc-searcher-catcher.log"
+                     filePattern="${log4j.base}/doc-searcher-catcher-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p [%c] - %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1024 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1"/>
+        </RollingFile>
+
+        <Async name="async-doc-searcher-catcher">
+            <AppenderRef ref="doc-searcher-catcher"/>
+        </Async>
+    </Appenders>
+
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="runinfo"/>
+        </Root>
+
+        <!--拦截规则-->
+        <Logger name="us.codecraft.webmagic" level="INFO" includeLocation="true"
+                additivity="false">
+            <AppenderRef ref="async-doc-searcher-catcher"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
